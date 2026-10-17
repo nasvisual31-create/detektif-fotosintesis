@@ -74,10 +74,10 @@ class Store {
                 name: 'Muhammad Nasrullah',
                 role: 'Pengembang Media Pembelajaran Interaktif 3D',
                 institution: 'Universitas Lambung Mangkurat',
-                programStudy: 'Pendidikan Guru Sekolah Dasar (PGSD)',
-                email: 'pengembang@email.com',
+                programStudy: 'S-1 Teknologi Pendidikan',
+                email: 'nasvisual31@gmail.com',
                 bio: 'Media pembelajaran interaktif 3D "Detektif Fotosintesis" ini dikembangkan untuk memfasilitasi siswa kelas 4 SD dalam memahami bagian-bagian tumbuhan dan proses fotosintesis secara visual, konkret, dan menyenangkan.',
-                supervisor: 'Dosen Pembimbing / Ahli Media'
+                supervisor: 'Brezto Asagi Dewantara, S.Pd., M.Pd.'
             },
             progress: {
                 homeVisited: false,
@@ -155,10 +155,22 @@ class Store {
                         ...defaultState.progress,
                         ...(parsed.progress || {})
                     },
-                    developerProfile: {
-                        ...defaultState.developerProfile,
-                        ...(parsed.developerProfile || {})
-                    }
+                    developerProfile: (() => {
+                        const dev = {
+                            ...defaultState.developerProfile,
+                            ...(parsed.developerProfile || {})
+                        };
+                        if (!dev.email || dev.email === 'pengembang@email.com') {
+                            dev.email = 'nasvisual31@gmail.com';
+                        }
+                        if (!dev.supervisor || dev.supervisor === 'Dosen Pembimbing / Ahli Media' || dev.supervisor.toLowerCase().includes('dosen pembimbing')) {
+                            dev.supervisor = 'Brezto Asagi Dewantara, S.Pd., M.Pd.';
+                        }
+                        if (!dev.programStudy || dev.programStudy.includes('Pendidikan Guru Sekolah Dasar') || dev.programStudy === 'Pendidikan Guru Sekolah Dasar (PGSD)') {
+                            dev.programStudy = 'S-1 Teknologi Pendidikan';
+                        }
+                        return dev;
+                    })()
                 };
             }
             return defaultState;
