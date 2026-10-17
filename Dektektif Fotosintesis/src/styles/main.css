@@ -1,0 +1,690 @@
+:root {
+    /* Color Palette - Vibrant & Friendly */
+    --primary: #4ade80; /* Green */
+    --primary-dark: #22c55e;
+    --primary-light: #86efac;
+    --secondary: #fbbf24; /* Yellow/Sunflower */
+    --secondary-dark: #f59e0b;
+    --accent: #38bdf8; /* Blue/Water/Sky */
+    --accent-dark: #0284c7;
+    --background: #f0fdf4; /* Very light green */
+    --surface: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --error: #ef4444;
+    --success: #10b981;
+
+    /* Shadows for depth */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 15px rgba(74, 222, 128, 0.5);
+    
+    /* Layout */
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
+    overflow: hidden; /* App-like feel */
+    width: 100vw;
+    height: 100vh;
+}
+
+#app-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-main);
+}
+
+p {
+    line-height: 1.6;
+}
+
+/* Glassmorphism Surface */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 14px rgba(74, 222, 128, 0.4);
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    color: white;
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
+}
+.btn-secondary:hover {
+    background-color: var(--secondary-dark);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Fullscreen Views */
+.view-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Split View khusus Materi dan Simulasi (Sidebar kiri + Canvas kanan di desktop) */
+.view-container-split {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* Sidebar Layout untuk Halaman Materi/Lab */
+.sidebar-panel {
+    width: 380px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+    z-index: 5;
+    padding: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Bottom Sheet Khusus Mobile */
+.mobile-bottom-sheet {
+    display: none;
+}
+
+/* Step Pills untuk Tahapan Fotosintesis */
+.step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f8fafc;
+    color: var(--text-main);
+    user-select: none;
+}
+.step-pill:hover {
+    background: #f1f5f9;
+    border-color: var(--primary);
+}
+.step-pill.active {
+    background: var(--primary-dark);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+    transform: translateY(-2px);
+}
+
+/* Responsif Tablet & HP */
+@media (max-width: 768px) {
+    .sidebar-panel {
+        display: none !important; /* Sidebar desktop disembunyikan di HP */
+    }
+
+    .mobile-bottom-sheet {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        z-index: 30;
+        transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 55vh;
+        overflow: hidden;
+    }
+
+    .mobile-bottom-sheet.collapsed {
+        max-height: 68px;
+    }
+
+    .sheet-handle-bar {
+        width: 40px;
+        height: 5px;
+        background: #cbd5e1;
+        border-radius: 99px;
+        margin: 8px auto 4px auto;
+        cursor: pointer;
+    }
+
+    .sim-sidebar-responsive {
+        display: flex !important;
+        width: 100% !important;
+        height: 44vh !important;
+        border-right: none;
+        border-top: 2px solid rgba(0, 0, 0, 0.08);
+        order: 2;
+        padding: 14px 16px;
+    }
+
+    #canvas-wrapper {
+        height: 56vh !important;
+        flex: none !important;
+        order: 1;
+    }
+
+    .view-container,
+    .view-container-split {
+        flex-direction: column !important;
+    }
+
+    #explanation-panel {
+        top: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        max-width: calc(100% - 16px) !important;
+        max-height: 42vh !important;
+        padding: 12px 14px !important;
+    }
+}
+
+/* Explanation Panel Animation */
+#explanation-panel {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ==========================================================================
+/* ==========================================================================
+   3D Interactive Hotspot Markers ("Titik Tombol Pencet Bulat Putih")
+   ========================================================================== */
+#hotspots-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 20;
+}
+
+.hotspot-pin {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 25;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hotspot-pin:hover {
+    transform: translate(-50%, -50%) scale(1.22);
+    z-index: 35;
+}
+
+/* Tombol Bulat Putih Minimalis & Bersih (Tidak Menutupi Bunga) */
+.hotspot-white-btn {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.6), 0 0 14px rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* Titik Pusat di Tengah Tombol Bulat Putih */
+.hotspot-white-btn::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 6px #22c55e;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.hotspot-pin:hover .hotspot-white-btn::before {
+    background: #15803d;
+    transform: scale(1.3);
+}
+
+/* Gelombang Pendar Lingkaran Berdenyut Lembut */
+.hotspot-white-btn::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    animation: whiteHotspotRipple 2.2s infinite cubic-bezier(0.2, 0.6, 0.3, 1);
+    pointer-events: none;
+}
+
+@keyframes whiteHotspotRipple {
+    0% {
+        transform: scale(0.7);
+        opacity: 0.95;
+    }
+    60% {
+        transform: scale(1.7);
+        opacity: 0.35;
+    }
+    100% {
+        transform: scale(2.3);
+        opacity: 0;
+    }
+}
+
+/* Tooltip Melayang (HANYA MUNCUL KETIKA DI-HOVER / DISENTUH, TIDAK MENUTUPI MODEL) */
+.hotspot-white-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 5px 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border: 1.5px solid #86efac;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.hotspot-white-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.96) transparent transparent transparent;
+}
+
+.hotspot-pin:hover .hotspot-white-tooltip,
+.hotspot-pin:focus .hotspot-white-tooltip,
+.hotspot-pin:active .hotspot-white-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.hotspot-tooltip-title {
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hotspot-tooltip-sub {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+/* ==========================================================================
+   Backdrop Blur Modal (Penjelasan Besar dengan Latar Samping Blur)
+   ========================================================================== */
+.modal-backdrop-blur {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(12px, 3vw, 24px);
+    z-index: 9999;
+    animation: modalFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-dialog-large {
+    background: white;
+    border-radius: 28px;
+    max-width: 620px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: clamp(24px, 4vw, 36px);
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    border: 3px solid #f59e0b;
+    animation: modalPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalPopIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-avatar {
+    font-size: 3.5rem;
+    line-height: 1;
+    margin-bottom: 12px;
+    display: inline-block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+    animation: bounceSlow 3s infinite ease-in-out;
+}
+
+@keyframes bounceSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.modal-inner-box {
+    background: #ecfdf5;
+    border-radius: 18px;
+    padding: 16px 20px;
+    border: 1.5px solid #a7f3d0;
+    margin: 18px 0;
+    text-align: left;
+}
+
+.modal-inner-box h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #047857;
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.modal-inner-box p {
+    color: #1e293b;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.modal-btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #10b981;
+    color: white;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 14px 32px;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 5px 0 #047857, 0 10px 20px rgba(16, 185, 129, 0.35);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-btn-action:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 #047857, 0 14px 24px rgba(16, 185, 129, 0.45);
+}
+
+.modal-btn-action:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #047857;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   Mission Cards Grid (Duplikasi Desain Gambar Misi 1-8)
+   ========================================================================== */
+.mission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 10px 0 30px;
+}
+
+.mission-card {
+    background: white;
+    border: 2px solid #86efac;
+    border-radius: 20px;
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.08);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-dark);
+    box-shadow: 0 12px 28px rgba(34, 197, 94, 0.2);
+}
+
+.mission-card.active-mission {
+    border-color: #22c55e;
+    border-width: 2.5px;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2), 0 10px 25px rgba(34, 197, 94, 0.15);
+}
+
+.mission-number-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.mission-number-circle.completed {
+    background: #22c55e;
+    color: white;
+}
+
+.mission-number-circle.active {
+    background: #dcfce7;
+    color: #15803d;
+    border: 2px solid #22c55e;
+}
+
+.mission-number-circle.locked {
+    background: #e2e8f0;
+    color: #94a3b8;
+}
+
+.mission-badge-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #15803d;
+    color: white;
+    font-weight: 800;
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+    letter-spacing: 0.5px;
+}
+
+.mission-badge-xp {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #d97706;
+    font-weight: 800;
+    font-size: 0.88rem;
+}
+
+/* Master Audio Global Toggle Button */
+.btn-master-audio {
+    background: #fef2f2;
+    border: 1.5px solid #f87171;
+    color: #dc2626;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.btn-master-audio:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.btn-master-audio:active {
+    transform: translateY(1px);
+}
+
+.btn-master-audio[aria-pressed="true"],
+.btn-master-audio.active {
+    background: #dcfce7;
+    border-color: #22c55e;
+    color: #15803d;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+
+
