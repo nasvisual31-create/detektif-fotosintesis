@@ -152,17 +152,86 @@ export function renderSimulasi(router) {
                 <div id="exp-desc" style="font-size: 0.9rem; color: var(--text-main); line-height: 1.55; max-height: 220px; overflow-y: auto;">Penjelasan</div>
             </div>
 
-            <!-- Prediction Overlay -->
-            <div id="prediction-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 30; align-items: center; justify-content: center;">
-                <div class="glass-panel" style="background: white; padding: 30px; border-radius: 16px; max-width: 480px; text-align: center; animation: pulse 0.5s ease-out; margin: 20px;">
-                    <i data-lucide="help-circle" style="width: 56px; height: 56px; color: var(--secondary); margin-bottom: 16px;"></i>
-                    <h2 style="margin-bottom: 12px; font-size: 1.4rem; color: var(--text-main);">Menurutmu apa yang akan terjadi?</h2>
-                    <p id="prediction-context" style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem;"></p>
+            <!-- Interactive Prediction Modal Overlay -->
+            <div id="prediction-overlay" style="display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 50; align-items: center; justify-content: center; padding: 16px;">
+                
+                <!-- 1. Question Card (Tantangan Prediksi Sains) -->
+                <div id="pred-question-card" class="glass-panel" style="background: white; border-radius: 24px; max-width: 500px; width: 100%; padding: clamp(20px, 4vw, 30px); text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 2.5px solid #22c55e; animation: modalPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
                     
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button id="btn-pred-1" class="btn btn-primary" style="background: var(--background); color: var(--primary-dark); border: 2px solid var(--primary-dark); font-size: 0.95rem; text-align: left;"></button>
-                        <button id="btn-pred-2" class="btn btn-primary" style="background: var(--background); color: var(--primary-dark); border: 2px solid var(--primary-dark); font-size: 0.95rem; text-align: left;"></button>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <div id="pred-q-icon" style="width: 60px; height: 60px; border-radius: 50%; background: #ecfdf5; border: 2.5px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2);">
+                            🕵️‍♂️
+                        </div>
+                        <span id="pred-q-badge" style="font-size: 0.78rem; font-weight: 800; color: #047857; background: #d1fae5; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase;">
+                            🔍 Tantangan Detektif Sains
+                        </span>
                     </div>
+
+                    <h2 id="pred-q-title" style="margin: 0 0 10px 0; font-size: clamp(1.15rem, 2.5vw, 1.35rem); color: #0f172a; font-weight: 800; line-height: 1.3;">
+                        Menurutmu apa yang akan terjadi?
+                    </h2>
+                    
+                    <p id="prediction-context" style="color: #334155; margin: 0 0 18px 0; font-size: 0.95rem; line-height: 1.5; background: #f8fafc; padding: 12px 16px; border-radius: 14px; border: 1.5px dashed #cbd5e1; font-weight: 600; text-align: left;">
+                    </p>
+                    
+                    <!-- Pilihan Jawaban Interaktif A & B -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button id="btn-pred-1" class="btn-pred-choice" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; background: white; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 0.92rem; font-weight: 700; color: #1e293b; text-align: left; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.04);">
+                            <span style="min-width: 32px; height: 32px; border-radius: 10px; background: #f1f5f9; color: #047857; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 1.5px solid #cbd5e1; font-size: 0.95rem;">A</span>
+                            <span id="label-pred-1" style="flex: 1; line-height: 1.45;"></span>
+                        </button>
+
+                        <button id="btn-pred-2" class="btn-pred-choice" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; background: white; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 0.92rem; font-weight: 700; color: #1e293b; text-align: left; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.04);">
+                            <span style="min-width: 32px; height: 32px; border-radius: 10px; background: #f1f5f9; color: #047857; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 1.5px solid #cbd5e1; font-size: 0.95rem;">B</span>
+                            <span id="label-pred-2" style="flex: 1; line-height: 1.45;"></span>
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 14px;">
+                        <button id="btn-pred-cancel" class="btn" style="background: transparent; border: none; color: #94a3b8; font-size: 0.85rem; font-weight: 700; cursor: pointer; padding: 6px 12px; border-radius: 8px;">
+                            Batal & Tetap di Kondisi Saat Ini
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Result Card Interaktif (Pengganti Alert Kaku Browser) -->
+                <div id="pred-result-card" class="glass-panel" style="display: none; background: white; border-radius: 24px; max-width: 500px; width: 100%; padding: clamp(20px, 4vw, 30px); text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); animation: modalPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    
+                    <div id="pred-res-avatar" style="width: 72px; height: 72px; margin: 0 auto 12px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                        🎉
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                        <span id="pred-res-badge" style="font-size: 0.8rem; font-weight: 800; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">
+                            PREDIKSIMU TEPAT!
+                        </span>
+                    </div>
+
+                    <h2 id="pred-res-title" style="margin: 0 0 12px 0; font-size: clamp(1.2rem, 2.5vw, 1.4rem); font-weight: 800; line-height: 1.3;">
+                        Luar Biasa, Detektif Hebat!
+                    </h2>
+
+                    <!-- Box Penjelasan Sains & Suara TTS -->
+                    <div id="pred-res-box" style="background: #f8fafc; border-radius: 16px; padding: 14px 16px; margin-bottom: 20px; text-align: left; border: 1.5px solid #e2e8f0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <div id="pred-res-box-header" style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.88rem; color: #047857;">
+                                <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
+                                <span>Penjelasan Ilmiah:</span>
+                            </div>
+                            <button id="btn-speak-pred-res" title="Dengarkan Suara Penjelasan" class="btn" style="padding: 4px 8px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; color: #0284c7; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 700;">
+                                <i data-lucide="volume-2" style="width: 14px; height: 14px;"></i>
+                                <span>Dengar</span>
+                            </button>
+                        </div>
+                        <p id="pred-res-message" style="margin: 0; font-size: 0.92rem; color: #334155; line-height: 1.55; max-height: 180px; overflow-y: auto;">
+                        </p>
+                    </div>
+
+                    <!-- Tombol Lanjut ke Simulasi Molekul 3D -->
+                    <button id="btn-pred-continue" class="btn" style="width: 100%; padding: 14px 20px; border-radius: 16px; font-size: 1rem; font-weight: 800; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+                        <span id="btn-pred-continue-text">🔬 LIHAT SIMULASI 3D SEKARANG</span>
+                        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -261,35 +330,181 @@ export function renderSimulasi(router) {
         });
     }
 
-    // Prediction Logic
+    // Interactive Prediction Elements & Logic
     const predOverlay = container.querySelector('#prediction-overlay');
+    const predQuestionCard = container.querySelector('#pred-question-card');
+    const predResultCard = container.querySelector('#pred-result-card');
+    const predQIcon = container.querySelector('#pred-q-icon');
+    const predQBadge = container.querySelector('#pred-q-badge');
+    const predQTitle = container.querySelector('#pred-q-title');
     const predContext = container.querySelector('#prediction-context');
     const btnPred1 = container.querySelector('#btn-pred-1');
     const btnPred2 = container.querySelector('#btn-pred-2');
+    const labelPred1 = container.querySelector('#label-pred-1');
+    const labelPred2 = container.querySelector('#label-pred-2');
+    const btnPredCancel = container.querySelector('#btn-pred-cancel');
 
-    const askPrediction = (contextText, option1, option2, correctIndex, callback) => {
-        predContext.innerText = contextText;
-        btnPred1.innerText = option1;
-        btnPred2.innerText = option2;
-        
-        const handleAnswer = (selectedIndex) => {
-            if (selectedIndex === correctIndex) {
-                playSound('correct');
-                alert("Prediksimu Hebat! Mari kita lihat langsung simulasi molekul 3D-nya.");
-            } else {
-                playSound('wrong');
-                alert("Kurang tepat, tapi tidak apa-apa! Mari kita perhatikan apa yang sebenarnya terjadi di simulasi.");
+    const predResAvatar = container.querySelector('#pred-res-avatar');
+    const predResBadge = container.querySelector('#pred-res-badge');
+    const predResTitle = container.querySelector('#pred-res-title');
+    const predResBox = container.querySelector('#pred-res-box');
+    const predResBoxHeader = container.querySelector('#pred-res-box-header');
+    const predResMessage = container.querySelector('#pred-res-message');
+    const btnSpeakPredRes = container.querySelector('#btn-speak-pred-res');
+    const btnPredContinue = container.querySelector('#btn-pred-continue');
+    const btnPredContinueText = container.querySelector('#btn-pred-continue-text');
+
+    let predExplanationSpeech = "";
+
+    // Hover effect untuk tombol pilihan prediksi
+    [btnPred1, btnPred2].forEach(btn => {
+        if (!btn) return;
+        btn.onmouseenter = () => {
+            btn.style.borderColor = '#10b981';
+            btn.style.background = '#f0fdf4';
+            btn.style.transform = 'translateY(-2px)';
+            btn.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.15)';
+        };
+        btn.onmouseleave = () => {
+            btn.style.borderColor = '#e2e8f0';
+            btn.style.background = 'white';
+            btn.style.transform = 'none';
+            btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.04)';
+        };
+    });
+
+    if (btnSpeakPredRes) {
+        btnSpeakPredRes.onclick = () => {
+            if (predExplanationSpeech) {
+                speakText(predExplanationSpeech);
             }
-            predOverlay.style.display = 'none';
-            btnPred1.onclick = null;
-            btnPred2.onclick = null;
-            callback();
+        };
+    }
+
+    const askPrediction = (param1, param2, param3, param4, param5) => {
+        let config = {};
+        if (typeof param1 === 'object' && param1 !== null) {
+            config = param1;
+        } else {
+            config = {
+                context: param1,
+                option1: param2,
+                option2: param3,
+                correctIndex: param4,
+                callback: param5,
+                feedbackCorrect: "Prediksimu sangat hebat! Mari kita lihat langsung bagaimana molekul 3D bergerak di simulasi.",
+                feedbackWrong: "Kurang tepat, tapi tidak apa-apa! Mari kita perhatikan bersama apa yang sebenarnya terjadi di simulasi 3D."
+            };
+        }
+
+        const icon = config.icon || "🕵️‍♂️";
+        const badge = config.badge || "🔍 TANTANGAN DETEKTIF SAINS";
+        const title = config.title || "Menurutmu apa yang akan terjadi?";
+        const contextText = config.context || "";
+        const opt1 = config.option1 || "";
+        const opt2 = config.option2 || "";
+        const correctIndex = config.correctIndex || 1;
+        const callback = config.onContinue || config.callback || (() => {});
+        const feedbackCorrect = config.feedbackCorrect || "Prediksimu sangat hebat! Mari kita amati langsung bagaimana simulasi molekul 3D berjalan.";
+        const feedbackWrong = config.feedbackWrong || "Kurang tepat, tapi tidak apa-apa! Mari kita amati bersama apa yang sebenarnya terjadi di simulasi 3D.";
+
+        predQIcon.innerText = icon;
+        predQBadge.innerText = badge;
+        predQTitle.innerText = title;
+        predContext.innerText = contextText;
+        labelPred1.innerText = opt1;
+        labelPred2.innerText = opt2;
+
+        // Tampilkan kartu pertanyaan dan sembunyikan kartu hasil
+        predQuestionCard.style.display = 'block';
+        predResultCard.style.display = 'none';
+        predOverlay.style.display = 'flex';
+
+        if (btnPredCancel) {
+            btnPredCancel.onclick = () => {
+                stopSpeaking();
+                predOverlay.style.display = 'none';
+            };
+        }
+
+        const handleAnswer = (selectedIndex) => {
+            const isCorrect = (selectedIndex === correctIndex);
+
+            // Sembunyikan question card, tampilkan result card interaktif
+            predQuestionCard.style.display = 'none';
+            predResultCard.style.display = 'block';
+
+            if (isCorrect) {
+                // Mainkan SFX Benar (Ting!) persis seperti di kuis
+                playSound('correct');
+
+                predResultCard.style.border = '2.5px solid #10b981';
+                predResAvatar.innerText = '🎉';
+                predResAvatar.style.background = '#dcfce7';
+                predResAvatar.style.border = '3px solid #10b981';
+
+                predResBadge.innerText = '🎉 PREDIKSIMU TEPAT SEKALI!';
+                predResBadge.style.background = '#dcfce7';
+                predResBadge.style.color = '#047857';
+                predResBadge.style.border = '1.5px solid #86efac';
+
+                predResTitle.innerText = 'Luar Biasa, Analisismu Benar!';
+                predResTitle.style.color = '#065f46';
+
+                predResBox.style.background = '#f0fdf4';
+                predResBox.style.borderColor = '#bbf7d0';
+                predResBoxHeader.innerHTML = '<i data-lucide="check-circle" style="color: #10b981; width: 16px; height: 16px;"></i> <span style="color: #047857; font-weight: 800;">Penjelasan Ilmiah:</span>';
+                predResMessage.innerHTML = feedbackCorrect;
+
+                btnPredContinue.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                btnPredContinue.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.35)';
+                btnPredContinueText.innerText = '🔬 BUKTIKAN DI SIMULASI 3D';
+
+                predExplanationSpeech = `Luar Biasa, Analisismu Benar! ${feedbackCorrect.replace(/<[^>]*>?/gm, '')}`;
+            } else {
+                // Mainkan SFX Coba Lagi (Chime Suportif) persis seperti di kuis
+                playSound('wrong');
+
+                predResultCard.style.border = '2.5px solid #f59e0b';
+                predResAvatar.innerText = '💡';
+                predResAvatar.style.background = '#fef3c7';
+                predResAvatar.style.border = '3px solid #f59e0b';
+
+                predResBadge.innerText = '💡 EKSPLORASI SAINS BARU';
+                predResBadge.style.background = '#fef3c7';
+                predResBadge.style.color = '#b45309';
+                predResBadge.style.border = '1.5px solid #fcd34d';
+
+                predResTitle.innerText = 'Belum Tepat, Yuk Coba Amati!';
+                predResTitle.style.color = '#92400e';
+
+                predResBox.style.background = '#fffbeb';
+                predResBox.style.borderColor = '#fde68a';
+                predResBoxHeader.innerHTML = '<i data-lucide="help-circle" style="color: #f59e0b; width: 16px; height: 16px;"></i> <span style="color: #b45309; font-weight: 800;">Fakta Sebenarnya:</span>';
+                predResMessage.innerHTML = feedbackWrong;
+
+                btnPredContinue.style.background = 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)';
+                btnPredContinue.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.35)';
+                btnPredContinueText.innerText = '🔬 AMATI DI SIMULASI 3D SEKARANG';
+
+                predExplanationSpeech = `Belum Tepat, Yuk Coba Amati! ${feedbackWrong.replace(/<[^>]*>?/gm, '')}`;
+            }
+
+            if (window.lucide) window.lucide.createIcons();
+
+            btnPredContinue.onclick = () => {
+                stopSpeaking();
+                predOverlay.style.display = 'none';
+                btnPredContinue.onclick = null;
+                btnPred1.onclick = null;
+                btnPred2.onclick = null;
+                callback();
+            };
         };
 
         btnPred1.onclick = () => handleAnswer(1);
         btnPred2.onclick = () => handleAnswer(2);
-        
-        predOverlay.style.display = 'flex';
+
         if (window.lucide) window.lucide.createIcons();
     };
 
@@ -498,19 +713,24 @@ export function renderSimulasi(router) {
 
     btnNight.onclick = () => {
         if (!store.state.progress.hasPredictedNight) {
-            askPrediction(
-                "Jika matahari tenggelam (kondisi gelap)...",
-                "Fotosintesis berhenti sementara", // Correct
-                "Fotosintesis akan semakin cepat", // Wrong
-                1,
-                () => {
+            askPrediction({
+                icon: "🌙",
+                badge: "Tantangan Waktu Malam",
+                title: "Bagaimana Jika Matahari Tenggelam?",
+                context: "Jika matahari tenggelam dan lingkungan memasuki waktu malam yang gelap gulita...",
+                option1: "Fotosintesis berhenti sementara karena ketiadaan cahaya matahari",
+                option2: "Fotosintesis akan semakin cepat karena udara malam lebih sejuk",
+                correctIndex: 1,
+                feedbackCorrect: "Tepat sekali! Pigmen klorofil di kloroplas membutuhkan foton cahaya matahari sebagai bahan bakar pemecah air. Di malam hari tanpa sinar matahari, proses fotosintesis berhenti sementara dan celah stomata menyempit.",
+                feedbackWrong: "Kurang tepat! Tumbuhan membutuhkan sinar surya sebagai energi utama fotosintesis. Tanpa cahaya di malam hari, kloroplas tidak bisa memasak glukosa sehingga fotosintesis berhenti sementara.",
+                onContinue: () => {
                     store.update('progress.hasPredictedNight', true);
                     updateOpacity(btnNight, [btnDay]);
                     labManager.setSimulationState('isNight', true);
                     showExplanation(simulationData.time.NIGHT);
                     store.logAction('sim_set_night');
                 }
-            );
+            });
         } else {
             updateOpacity(btnNight, [btnDay]);
             labManager.setSimulationState('isNight', true);
@@ -538,19 +758,24 @@ export function renderSimulasi(router) {
     // --- TEMPERATURE CONTROLS (Dingin / Sedang / Panas) ---
     btnTempHot.onclick = () => {
         if (!store.state.progress.hasPredictedHot) {
-            askPrediction(
-                "Jika cuaca sangat panas menyengat...",
-                "Daun menjadi lebih hijau subur", // Wrong
-                "Daun bisa kehilangan banyak air dan stomata menutup", // Correct
-                2,
-                () => {
+            askPrediction({
+                icon: "🔥",
+                badge: "Tantangan Suhu Ekstrem",
+                title: "Bagaimana Jika Cuaca Sangat Panas?",
+                context: "Jika cuaca sangat panas menyengat dan suhu udara meningkat tajam...",
+                option1: "Daun menjadi lebih subur dan menghasilkan oksigen berlipat ganda",
+                option2: "Daun bisa kehilangan banyak air sehingga stomata menutup untuk bertahan",
+                correctIndex: 2,
+                feedbackCorrect: "Analisis hebat! Di bawah terik panas menyengat, tanaman berisiko mengalami kekeringan (dehidrasi). Daun secara otomatis menyempitkan stomata untuk menahan laju penguapan air.",
+                feedbackWrong: "Kurang tepat! Suhu yang terlalu panas menyengat membuat air di dalam daun menguap sangat cepat. Tanaman akan menutup celah stomata untuk bertahan hidup dan menghemat air.",
+                onContinue: () => {
                     store.update('progress.hasPredictedHot', true);
                     updateOpacity(btnTempHot, [btnTempCold, btnTempNormal]);
                     labManager.setSimulationState('temperature', 'HOT');
                     showExplanation(simulationData.temperature.HOT);
                     store.logAction('sim_set_temp_hot');
                 }
-            );
+            });
         } else {
             updateOpacity(btnTempHot, [btnTempCold, btnTempNormal]);
             labManager.setSimulationState('temperature', 'HOT');
@@ -591,12 +816,17 @@ export function renderSimulasi(router) {
 
     btnHazeThick.onclick = () => {
         if (!store.state.progress.hasPredictedHaze) {
-            askPrediction(
-                "Jika udara tertutup kabut asap tebal...",
-                "Fotosintesis terhenti karena cahaya terhalang dan stomata tersumbat abu", // Correct
-                "Fotosintesis makin cepat karena tumbuhan memakan asap", // Wrong
-                1,
-                () => {
+            askPrediction({
+                icon: "🌫️",
+                badge: "Tantangan Kabut Asap Polusi",
+                title: "Bagaimana Jika Udara Penuh Kabut Asap?",
+                context: "Jika udara di sekitar tanaman tertutup oleh kabut asap polusi yang sangat tebal...",
+                option1: "Fotosintesis terhenti karena cahaya terhalang dan stomata tersumbat abu polusi",
+                option2: "Fotosintesis makin cepat karena tumbuhan memakan partikel kabut asap",
+                correctIndex: 1,
+                feedbackCorrect: "Prediksimu sangat akurat! Kabut asap tebal menghalangi sinar matahari mencapai daun, dan partikel abu polusi menyumbat lubang stomata sehingga gas CO₂ terhambat masuk. Fotosintesis pun terhenti!",
+                feedbackWrong: "Kurang tepat! Tumbuhan hanya membutuhkan molekul gas CO₂ bersih, bukan asap polusi kotor. Asap tebal memblokir sinar matahari dan partikel abunya menutup lubang stomata daun.",
+                onContinue: () => {
                     store.update('progress.hasPredictedHaze', true);
                     updateOpacity(btnHazeThick, [btnHazeClean, btnHazeThin]);
                     labManager.setSimulationState('haze', 'THICK');
@@ -604,7 +834,7 @@ export function renderSimulasi(router) {
                     showExplanation(simulationData.haze.THICK);
                     store.logAction('sim_set_haze_thick');
                 }
-            );
+            });
         } else {
             updateOpacity(btnHazeThick, [btnHazeClean, btnHazeThin]);
             labManager.setSimulationState('haze', 'THICK');
