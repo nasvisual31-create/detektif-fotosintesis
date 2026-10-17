@@ -327,12 +327,16 @@ export const playHazeSound = () => {
     } catch (e) {}
 };
 
-// SFX Kuis & Selebrasi
+// SFX Kuis & Selebrasi & Feedback Interaktif
 export const playSound = (type) => {
-    if (!isAudioActive) return;
+    // Jangan bunyikan jika audio dimatikan secara eksplisit oleh pengguna
+    if (store && store.state && store.state.masterAudioEnabled === false) return;
 
     const ctx = getAudioContext();
     if (!ctx) return;
+    if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+    }
 
     if (type === 'correct') {
         // "Ting!" Ceria & Sukses
