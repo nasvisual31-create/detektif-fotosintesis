@@ -22,6 +22,18 @@ export function renderDeveloper(router) {
         dev.institution = 'Universitas Lambung Mangkurat';
         store.update('developerProfile', dev);
     }
+    if (!dev.programStudy || dev.programStudy.includes('Pendidikan Guru Sekolah Dasar') || dev.programStudy === 'Pendidikan Guru Sekolah Dasar (PGSD)') {
+        dev.programStudy = 'S-1 Teknologi Pendidikan';
+        store.update('developerProfile', dev);
+    }
+    if (!dev.email || dev.email === 'pengembang@email.com' || dev.email === 'pengembang@upi.edu') {
+        dev.email = 'nasvisual31@gmail.com';
+        store.update('developerProfile', dev);
+    }
+    if (!dev.supervisor || dev.supervisor === 'Dosen Pembimbing / Ahli Media' || dev.supervisor.toLowerCase().includes('dosen pembimbing')) {
+        dev.supervisor = 'Brezto Asagi Dewantara, S.Pd., M.Pd.';
+        store.update('developerProfile', dev);
+    }
     let isEditing = false;
 
     // Default SVG avatar jika belum ada foto
@@ -420,11 +432,11 @@ export function renderDeveloper(router) {
                         <div style="display: flex; flex-direction: column; gap: 6px; color: var(--text-muted); font-size: 0.95rem;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i data-lucide="graduation-cap" style="width: 18px; height: 18px; color: #059669;"></i>
-                                <span>${dev.programStudy || 'Pendidikan Guru Sekolah Dasar (PGSD)'}</span>
+                                <span>${dev.programStudy || 'S-1 Teknologi Pendidikan'}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i data-lucide="building-2" style="width: 18px; height: 18px; color: #059669;"></i>
-                                <span>${dev.institution || 'Universitas / Instansi Pendidikan'}</span>
+                                <span>${dev.institution || 'Universitas Lambung Mangkurat'}</span>
                             </div>
                         </div>
                     </div>
@@ -433,12 +445,12 @@ export function renderDeveloper(router) {
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
                         <div style="background: #f8fafc; padding: 14px 16px; border-radius: var(--radius-md); border-left: 4px solid #10b981; border: 1px solid #e2e8f0; border-left-width: 4px;">
                             <span style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Dosen Pembimbing / Validator</span>
-                            <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 4px; font-weight: 800;">${dev.supervisor || '-'}</h4>
+                            <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 4px; font-weight: 800;">${dev.supervisor || 'Brezto Asagi Dewantara, S.Pd., M.Pd.'}</h4>
                         </div>
 
                         <div style="background: #f8fafc; padding: 14px 16px; border-radius: var(--radius-md); border-left: 4px solid #0284c7; border: 1px solid #e2e8f0; border-left-width: 4px;">
                             <span style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email / Kontak Pengembang</span>
-                            <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 4px; font-weight: 800;">${dev.email || '-'}</h4>
+                            <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 4px; font-weight: 800;">${dev.email || 'nasvisual31@gmail.com'}</h4>
                         </div>
                     </div>
 
@@ -522,28 +534,28 @@ export function renderDeveloper(router) {
                         <label style="display: block; font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-bottom: 6px;">
                             Program Studi & Fakultas
                         </label>
-                        <input type="text" id="dev-study" value="${dev.programStudy || ''}" placeholder="Contoh: Pendidikan Guru Sekolah Dasar (PGSD)" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
+                        <input type="text" id="dev-study" value="${dev.programStudy || ''}" placeholder="Contoh: S-1 Teknologi Pendidikan" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
                     </div>
 
                     <div>
                         <label style="display: block; font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-bottom: 6px;">
                             Universitas / Instansi
                         </label>
-                        <input type="text" id="dev-inst" value="${dev.institution || ''}" placeholder="Contoh: Universitas Pendidikan Indonesia" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
+                        <input type="text" id="dev-inst" value="${dev.institution || ''}" placeholder="Contoh: Universitas Lambung Mangkurat" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
                     </div>
 
                     <div>
                         <label style="display: block; font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-bottom: 6px;">
                             Dosen Pembimbing / Ahli
                         </label>
-                        <input type="text" id="dev-supervisor" value="${dev.supervisor || ''}" placeholder="Contoh: Dr. Budi Santoso, M.Pd." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
+                        <input type="text" id="dev-supervisor" value="${dev.supervisor || ''}" placeholder="Contoh: Brezto Asagi Dewantara, S.Pd., M.Pd." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
                     </div>
 
                     <div style="grid-column: 1 / -1;">
                         <label style="display: block; font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-bottom: 6px;">
                             Email / Kontak
                         </label>
-                        <input type="email" id="dev-email" value="${dev.email || ''}" placeholder="Contoh: pengembang@upi.edu" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
+                        <input type="email" id="dev-email" value="${dev.email || ''}" placeholder="Contoh: nasvisual31@gmail.com" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem;">
                     </div>
 
                     <div style="grid-column: 1 / -1;">
