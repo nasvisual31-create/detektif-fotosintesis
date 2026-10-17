@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detektif Fotosintesis Interaktif 3D</title>
+    <meta name="description" content="Detektif Fotosintesis Interaktif - Media Pembelajaran 3D Struktur Tumbuhan & Fotosintesis IPAS Kelas 4 SD.">
+    <meta name="author" content="Muhammad Nasrullah">
+    <meta name="theme-color" content="#22c55e">
+    
+    <!-- Favicon (Tab Browser & Touch Icons) -->
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
+    <link rel="apple-touch-icon" href="./assets/icon-192.png">
+    
+    <!-- Open Graph (WhatsApp, Facebook, Medsos Preview Card) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="🔍🌻 Detektif Fotosintesis Interaktif 3D">
+    <meta property="og:description" content="Pecahkan misteri cara tumbuhan memasak makanan! Jelajahi struktur daun 3D, lab virtual, dan kuis seru IPAS Kelas 4 SD.">
+    <meta property="og:image" content="./assets/icon-512.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🔍🌻 Detektif Fotosintesis Interaktif 3D">
+    <meta name="twitter:description" content="Media Pembelajaran Interaktif 3D Struktur Tumbuhan & Fotosintesis IPAS Kelas 4 SD.">
+    <meta name="twitter:image" content="./assets/icon-512.png">
+
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/styles/main.css">
+    
+    <!-- Three.js Dependencies (Loaded locally for 100% Offline Support) -->
+    <script src="./lib/three.min.js"></script>
+    <script src="./lib/OrbitControls.js"></script>
+    <script src="./lib/GLTFLoader.js"></script>
+    <!-- Lucide Icons -->
+    <script src="./lib/lucide.js"></script>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Komponen akan dirender di sini oleh sistem routing -->
+    </div>
+
+    <!-- Modul Utama -->
+    <script type="module" src="./src/main.js"></script>
+
+    <!-- Register Service Worker (PWA Offline) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('ServiceWorker terdaftar!', reg.scope))
+                    .catch(err => console.log('ServiceWorker gagal:', err));
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Struktur Internal Daun 3D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #e9ecef;
+            font-family: sans-serif;
+            touch-action: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        
+        #reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #0288d1;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        #reset-btn:hover {
+            background: #0277bd;
+        }
+        #reset-btn:active {
+            transform: scale(0.98);
+        }
+
+        #legend {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            pointer-events: none;
+            color: #333;
+            z-index: 5;
+        }
+        #legend h4 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            color: #111;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .box {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            border-radius: 4px;
+            border: 1px solid #aaa;
+        }
+
+        /* Panel Penjelasan Info */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            z-index: 5;
+            display: none;
+            pointer-events: none;
+            border-left: 5px solid #0288d1;
+        }
+        #info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #111;
+            font-size: 18px;
+        }
+        #info-panel p {
+            margin: 0;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            #legend {
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                padding: 10px 15px;
+            }
+            #legend h4 {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            .legend-item {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+            #reset-btn {
+                top: 15px;
+                right: 15px;
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+            #info-panel {
+                top: 60px;
+                left: 15px;
+                right: 15px;
+                width: auto;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <button id="reset-btn">Reset Tampilan</button>
+    
+    <!-- Panel Informasi Dinamis -->
+    <div id="info-panel">
+        <h3 id="info-title">Judul</h3>
+        <p id="info-text">Penjelasan</p>
+    </div>
+
+    <div id="legend">
+        <h4>Keterangan Bagian Daun</h4>
+        <div class="legend-item"><span class="box" style="background: #deeebb;"></span> Epidermis (Pelindung)</div>
+        <div class="legend-item"><span class="box" style="background: #81c784;"></span> Sel Mesofil (Tiang & Bunga Karang)</div>
+        <div class="legend-item"><span class="box" style="background: #00e676; border-color: #00b300;"></span> Kloroplas (Tempat Fotosintesis)</div>
+        <div class="legend-item"><span class="box" style="background: #81d4fa; border-color: #4fc3f7;"></span> Berkas Pembuluh (Jalur Air)</div>
+        <div class="legend-item"><span class="box" style="background: #111111;"></span> Stomata (Lubang Udara)</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Data Penjelasan: Objek yang mudah diedit
+        const leafData = {
+            chloroplast: {
+                name: "Butir Kloroplas",
+                text: "Butir hijau ini mengandung klorofil. Klorofil menangkap cahaya matahari. Di sinilah cahaya, air, dan karbon dioksida diolah menjadi makanan bagi tumbuhan dan oksigen."
+            },
+            stomata: {
+                name: "Stomata",
+                text: "Lubang kecil ini adalah pintu masuk karbon dioksida dari udara ke dalam daun. Oksigen hasil fotosintesis juga keluar lewat sini."
+            },
+            vein: {
+                name: "Berkas Pembuluh",
+                text: "Bagian ini seperti pipa kecil yang mengalirkan air dari akar ke daun. Air dibutuhkan untuk fotosintesis."
+            },
+            upperEpidermis: {
+                name: "Epidermis Atas",
+                text: "Lapisan tipis ini melindungi daun dan membiarkan cahaya matahari masuk ke bagian dalam daun."
+            },
+            lowerEpidermis: {
+                name: "Epidermis Bawah",
+                text: "Lapisan tipis ini melindungi bagian bawah daun. Di lapisan ini terdapat banyak stomata sebagai pintu keluar masuknya udara."
+            },
+            mesophyll: {
+                name: "Sel Mesofil",
+                text: "Bagian ini adalah tempat utama terjadinya fotosintesis. Di dalamnya terdapat banyak sekali butir kloroplas yang menangkap cahaya matahari."
+            }
+        };
+
+        const scene = new THREE.Scene();
+
+        const initialCameraPos = new THREE.Vector3(15, 12, 18);
+        const initialTargetPos = new THREE.Vector3(0, 0, 0);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.copy(initialCameraPos);
+
+        const canvasContainer = document.getElementById('canvas-container');
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        canvasContainer.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 9;
+        controls.maxDistance = 35;
+        controls.target.copy(initialTargetPos);
+
+        // Tombol Reset sekarang juga mereset seleksi dan info
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            camera.position.copy(initialCameraPos);
+            controls.target.copy(initialTargetPos);
+            controls.update(); 
+            resetInfo();
+            resetHighlight();
+        });
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        dirLight.position.set(10, 15, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+        const fillLight = new THREE.DirectionalLight(0xaaccff, 0.4);
+        fillLight.position.set(-10, -10, -10);
+        scene.add(fillLight);
+
+        // Kumpulan Material
+        const epidermisMat = new THREE.MeshStandardMaterial({ 
+            color: 0xdeeebb, transparent: true, opacity: 0.5,
+            roughness: 0.2, metalness: 0.1, side: THREE.DoubleSide
+        });
+        // Kita gandakan epidermis mat agar epidermis atas dan bawah bisa disorot terpisah
+        const upperEpiMat = epidermisMat.clone();
+        const lowerEpiMat = epidermisMat.clone();
+
+        const palisadeMat = new THREE.MeshStandardMaterial({ color: 0x81c784, roughness: 0.7 });
+        const spongyMat = new THREE.MeshStandardMaterial({ color: 0xaed581, roughness: 0.8 });
+        
+        const chloroplastMat = new THREE.MeshStandardMaterial({ 
+            color: 0x00e676, emissive: 0x003300, roughness: 0.4 
+        });
+        
+        const veinSheathMat = new THREE.MeshStandardMaterial({ color: 0x81d4fa, roughness: 0.6, transparent: true, opacity: 0.8 }); 
+        const xylemMat = new THREE.MeshStandardMaterial({ color: 0x03a9f4, roughness: 0.5 }); 
+        const phloemMat = new THREE.MeshStandardMaterial({ color: 0x0288d1, roughness: 0.5 }); 
+        
+        const guardCellMat = new THREE.MeshStandardMaterial({ color: 0x66bb6a, roughness: 0.6 });
+        const stomaHoleMat = new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide });
+
+        // Simpan semua material di satu array untuk mempermudah redup/sorot
+        const allMaterials = [
+            upperEpiMat, lowerEpiMat, palisadeMat, spongyMat,
+            chloroplastMat, veinSheathMat, xylemMat, phloemMat,
+            guardCellMat, stomaHoleMat
+        ];
+
+        // Backup state original dari setiap material
+        allMaterials.forEach(mat => {
+            mat.userData = {
+                origOpacity: mat.opacity,
+                origTransparent: mat.transparent
+            };
+        });
+
+        const leafGroup = new THREE.Group();
+        scene.add(leafGroup);
+
+        const width = 10;
+        const depth = 10;
+        const epiThickness = 0.15;
+
+        // Epidermis Atas
+        const upperEpiGeo = new THREE.BoxGeometry(width, epiThickness, depth);
+        const upperEpi = new THREE.Mesh(upperEpiGeo, upperEpiMat);
+        upperEpi.position.y = 1.35;
+        upperEpi.receiveShadow = true;
+        upperEpi.userData = { part: 'upperEpidermis' }; // Tag untuk fitur klik
+        leafGroup.add(upperEpi);
+
+        // Mesofil (Palisade)
+        const palisadeGeo = new THREE.CylinderGeometry(0.3, 0.3, 1.1, 16);
+        const chloroGeo = new THREE.SphereGeometry(0.12, 8, 8); 
+
+        for (let x = -4.6; x <= 4.6; x += 0.65) {
+            for (let z = -4.6; z <= 4.6; z += 0.65) {
+                if (Math.abs(x) < 1.8) continue;
+
+                const cell = new THREE.Mesh(palisadeGeo, palisadeMat);
+                cell.position.set(x + (Math.random()*0.1), 0.7, z + (Math.random()*0.1));
+                cell.castShadow = true;
+                cell.receiveShadow = true;
+                cell.userData = { part: 'mesophyll' };
+                
+                for(let c = 0; c < 8; c++) {
+                    const chloro = new THREE.Mesh(chloroGeo, chloroplastMat);
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = 0.3; 
+                    const cy = (Math.random() - 0.5) * 0.9;
+                    chloro.position.set(Math.cos(angle) * r, cy, Math.sin(angle) * r);
+                    chloro.userData = { part: 'chloroplast' }; // Tag untuk kloroplas
+                    cell.add(chloro);
+                }
+                
+                leafGroup.add(cell);
+            }
+        }
+
+        // Mesofil (Spongy)
+        const spongyGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        for (let i = 0; i < 90; i++) {
+            const x = (Math.random() - 0.5) * 9.2;
+            const z = (Math.random() - 0.5) * 9.2;
+            const y = -0.8 + (Math.random() * 0.7); 
+            
+            if (Math.abs(x) < 2.0 && y > -0.3) continue;
+            
+            const cell = new THREE.Mesh(spongyGeo, spongyMat);
+            cell.position.set(x, y, z);
+            cell.scale.set(1 + Math.random()*0.3, 1 + Math.random()*0.3, 1 + Math.random()*0.3);
+            cell.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+            cell.castShadow = true;
+            cell.receiveShadow = true;
+            cell.userData = { part: 'mesophyll' };
+
+            for(let c = 0; c < 5; c++) {
+                const chloro = new THREE.Mesh(chloroGeo, chloroplastMat);
+                const r = 0.35;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                chloro.position.set(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+                chloro.userData = { part: 'chloroplast' }; // Tag kloroplas
+                cell.add(chloro);
+            }
+            leafGroup.add(cell);
+        }
+
+        // Berkas Pembuluh
+        const veinGroup = new THREE.Group();
+        const sheathGeo = new THREE.CylinderGeometry(1.2, 1.2, depth, 32);
+        const sheath = new THREE.Mesh(sheathGeo, veinSheathMat);
+        sheath.rotation.x = Math.PI / 2;
+        sheath.receiveShadow = true;
+        sheath.castShadow = true;
+        sheath.userData = { part: 'vein' }; // Tag
+        veinGroup.add(sheath);
+
+        const xylemTGeo = new THREE.CylinderGeometry(0.2, 0.2, depth + 0.1, 16);
+        for(let i = 0; i < 7; i++) {
+            const x = (Math.random() - 0.5) * 1.2;
+            const y = 0.2 + Math.random() * 0.5;
+            if(Math.sqrt(x*x + y*y) > 0.8) continue;
+            
+            const xylem = new THREE.Mesh(xylemTGeo, xylemMat);
+            xylem.rotation.x = Math.PI / 2;
+            xylem.position.set(x, y, 0);
+            xylem.userData = { part: 'vein' }; // Tag
+            veinGroup.add(xylem);
+        }
+
+        const phloemTGeo = new THREE.CylinderGeometry(0.15, 0.15, depth + 0.1, 16);
+        for(let i = 0; i < 10; i++) {
+            const x = (Math.random() - 0.5) * 1.2;
+            const y = -0.2 - Math.random() * 0.5;
+            if(Math.sqrt(x*x + y*y) > 0.8) continue;
+
+            const phloem = new THREE.Mesh(phloemTGeo, phloemMat);
+            phloem.rotation.x = Math.PI / 2;
+            phloem.position.set(x, y, 0);
+            phloem.userData = { part: 'vein' }; // Tag
+            veinGroup.add(phloem);
+        }
+
+        veinGroup.position.set(0, 0.1, 0);
+        leafGroup.add(veinGroup);
+
+        // Epidermis Bawah
+        const lowerEpiGeo = new THREE.BoxGeometry(width, epiThickness, depth);
+        const lowerEpi = new THREE.Mesh(lowerEpiGeo, lowerEpiMat);
+        lowerEpi.position.y = -1.15;
+        lowerEpi.receiveShadow = true;
+        lowerEpi.userData = { part: 'lowerEpidermis' };
+        leafGroup.add(lowerEpi);
+
+        // Stomata
+        const guardGeo = new THREE.SphereGeometry(0.18, 16, 16);
+        const holeGeo = new THREE.PlaneGeometry(0.15, 0.45);
+
+        for(let i = 0; i < 25; i++) { 
+            const x = (Math.random() - 0.5) * 9;
+            const z = (Math.random() - 0.5) * 9;
+            
+            const stomaGroup = new THREE.Group();
+            
+            const guardLeft = new THREE.Mesh(guardGeo, guardCellMat);
+            guardLeft.scale.set(0.5, 0.5, 1.5);
+            guardLeft.position.set(-0.1, 0, 0);
+            guardLeft.userData = { part: 'stomata' }; // Tag
+            
+            const guardRight = new THREE.Mesh(guardGeo, guardCellMat);
+            guardRight.scale.set(0.5, 0.5, 1.5);
+            guardRight.position.set(0.1, 0, 0);
+            guardRight.userData = { part: 'stomata' }; // Tag
+            
+            const hole = new THREE.Mesh(holeGeo, stomaHoleMat);
+            hole.rotation.x = -Math.PI / 2;
+            hole.userData = { part: 'stomata' }; // Tag
+            
+            stomaGroup.add(guardLeft);
+            stomaGroup.add(guardRight);
+            stomaGroup.add(hole);
+            
+            stomaGroup.position.set(x, -1.25, z);
+            stomaGroup.rotation.y = Math.random() * Math.PI;
+            
+            leafGroup.add(stomaGroup);
+        }
+
+        // --- FITUR KLIK DAN INTERAKSI ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let pointerDownPos = new THREE.Vector2();
+        
+        // Kita menggunakan pointerdown dan pointerup agar kompatibel dengan sentuhan HP dan mouse komputer,
+        // serta membedakannya dari tindakan men-drag/memutar layar.
+        window.addEventListener('pointerdown', (e) => {
+            // Hindari memproses klik jika yang ditekan adalah elemen UI (tombol atau teks)
+            if (e.target.tagName === 'BUTTON' || e.target.closest('#legend') || e.target.closest('#info-panel')) return;
+            pointerDownPos.set(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('#legend') || e.target.closest('#info-panel')) return;
+            // Hitung jarak pergeseran kursor dari saat ditekan hingga dilepas
+            const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+            // Jika jaraknya kurang dari 5 pixel, kita anggap itu adalah "klik" (bukan drag untuk merotasi)
+            if (dist < 5) {
+                processClick(e.clientX, e.clientY);
+            }
+        });
+
+        const infoPanel = document.getElementById('info-panel');
+        const infoTitle = document.getElementById('info-title');
+        const infoText = document.getElementById('info-text');
+
+        function showInfo(partKey) {
+            const data = leafData[partKey];
+            infoTitle.innerText = data.name;
+            infoText.innerText = data.text;
+            infoPanel.style.display = 'block';
+        }
+
+        function resetInfo() {
+            infoPanel.style.display = 'none';
+        }
+
+        function highlightPart(part) {
+            // Tentukan material mana yang menjadi milik bagian yang diklik
+            let activeMaterials = [];
+            if (part === 'chloroplast') activeMaterials = [chloroplastMat];
+            else if (part === 'stomata') activeMaterials = [guardCellMat, stomaHoleMat];
+            else if (part === 'vein') activeMaterials = [veinSheathMat, xylemMat, phloemMat];
+            else if (part === 'upperEpidermis') activeMaterials = [upperEpiMat];
+            else if (part === 'lowerEpidermis') activeMaterials = [lowerEpiMat];
+            else if (part === 'mesophyll') activeMaterials = [palisadeMat, spongyMat];
+
+            // Terapkan efek sorot dan redup
+            allMaterials.forEach(mat => {
+                if (activeMaterials.includes(mat)) {
+                    // Bagian yang disorot: kembalikan ke opacity normal
+                    mat.opacity = mat.userData.origOpacity;
+                    mat.transparent = mat.userData.origTransparent;
+                } else {
+                    // Bagian yang diredupkan: jadikan transparan dan opacity rendah
+                    mat.transparent = true;
+                    mat.opacity = 0.15;
+                }
+                mat.needsUpdate = true; // Perbarui shader Three.js
+            });
+        }
+
+        function resetHighlight() {
+            // Kembalikan semua material ke keadaan semula
+            allMaterials.forEach(mat => {
+                mat.opacity = mat.userData.origOpacity;
+                mat.transparent = mat.userData.origTransparent;
+                mat.needsUpdate = true;
+            });
+        }
+
+        function processClick(clientX, clientY) {
+            // Normalisasi posisi mouse (dari -1 sampai +1) untuk raycaster
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Cek interaksi dengan seluruh objek di dalam daun
+            const intersects = raycaster.intersectObjects(leafGroup.children, true);
+
+            if (intersects.length > 0) {
+                let clickedPart = null;
+                // Cari objek pertama yang terkena klik dan memiliki tag 'part'
+                for (let i = 0; i < intersects.length; i++) {
+                    if (intersects[i].object.userData && intersects[i].object.userData.part) {
+                        clickedPart = intersects[i].object.userData.part;
+                        break;
+                    }
+                }
+
+                if (clickedPart && leafData[clickedPart]) {
+                    showInfo(clickedPart);
+                    highlightPart(clickedPart);
+                } else {
+                    // Jika klik pada bagian yang bukan bagian penting (misal sel mesofil biasa)
+                    resetInfo();
+                    resetHighlight();
+                }
+            } else {
+                // Jika klik area kosong di luar objek
+                resetInfo();
+                resetHighlight();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); 
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+        animate();
+    </script>
+</body>
+</html>
